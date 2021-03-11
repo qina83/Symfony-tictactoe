@@ -4,10 +4,13 @@
 namespace App\Domain;
 
 use Exception;
-use SebastianBergmann\Diff\TimeEfficientLongestCommonSubsequenceCalculator;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 class Board
 {
+    private UuidInterface $id;
+
     /** @var Tile[][] */
     private array $tiles;
 
@@ -19,6 +22,8 @@ class Board
      */
     public function __construct()
     {
+        $this->id = Uuid::uuid4();
+
         $this->tiles = [];
         for ($i = 1; $i <= 3; $i++) {
             for ($j = 1; $j <= 3; $j++) {
@@ -103,7 +108,7 @@ class Board
     {
         foreach ($this->tiles as $tileRow) {
             foreach ($tileRow as $tile) {
-               $tile->clean();
+                $tile->clean();
             }
         }
     }
