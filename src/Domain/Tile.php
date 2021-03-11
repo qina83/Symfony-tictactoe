@@ -4,9 +4,12 @@
 namespace App\Domain;
 
 use Exception;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 class Tile
 {
+    private UuidInterface $id;
     private int $mark;
 
     /**
@@ -14,6 +17,7 @@ class Tile
      */
     public function __construct()
     {
+        $this->id = Uuid::uuid4();
         $this->clean();
     }
 

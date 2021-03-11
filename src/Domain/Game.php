@@ -5,15 +5,26 @@ namespace App\Domain;
 
 
 use Exception;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Webmozart\Assert\Assert;
 
 class Game
 {
+    private UuidInterface $id;
     private Board $board;
     private ?Player $player1;
     private ?Player $player2;
     private ?Player $nextPlayer;
     private ?Player $winner;
+
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
 
 
     /**
@@ -22,6 +33,7 @@ class Game
     public function __construct()
     {
         $this->resetGame();
+        $this->id = Uuid::uuid4();
     }
 
 
@@ -62,6 +74,7 @@ class Game
         if (!$this->player1) {
             $this->player1 = Player::createOPlayer($nickName, $this->board);
         } else if (!$this->player2) {
+            if ($this->player1->getNickName() === $nickName) throw new Exception("Nickname already used");
             $this->player2 = Player::createXPlayer($nickName, $this->board);
         } else throw new Exception("Maximum number of player reached");
     }
@@ -89,6 +102,16 @@ class Game
             $this->nextPlayer = $this->player1;
         else
             $this->nextPlayer = $this->player2;
+    }
+
+    public function playerMark(string $nikname, TilePosition $position)
+    {
+        if ($nikname === $this->player1->getNickName())
+            $this->player1Mark($position);
+        else
+            if ($nikname === $this->player2->getNickName())
+                $this->player2Mark($position);
+            else throw new Exception("Nickname unknown");
     }
 
     public function player1Mark(TilePosition $position)
@@ -132,7 +155,8 @@ class Game
         $this->checkWinnerAndChangeTurn();
     }
 
-    public function resetGame(){
+    public function resetGame()
+    {
         $this->board = new Board();
         $this->player1 = null;
         $this->player2 = null;

@@ -3,10 +3,9 @@
 namespace App\Tests\Domain;
 
 use App\Domain\Game;
-use App\Domain\Tile;
+
 use App\Domain\TilePosition;
 use Exception;
-use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 use PHPUnit\Framework\TestCase;
 
 class GameTest extends TestCase
@@ -28,6 +27,15 @@ class GameTest extends TestCase
 
         self::assertTrue($players[0]->isO());
         self::assertTrue($players[1]->isX());
+    }
+
+    public function test_addPlayersWithSameNick_mustThrowException()
+    {
+        $this->game->addPlayer("player1");
+
+
+        self::expectException(Exception::class);
+        $this->game->addPlayer("player1");
     }
 
     public function test_addMoreThan2Players_MustThrowException()
@@ -176,7 +184,15 @@ class GameTest extends TestCase
         self::assertFalse($this->game->isGameOver());
         self::assertNull($this->game->getPlayer1());
         self::assertNull($this->game->getPlayer2());
+    }
 
+    public function test_playerMark_nickname_NotExists_mustThrowException(){
+        $this->game->addPlayer("player1");
+        $this->game->addPlayer("player2");
+        $this->game->startGame();
 
+        self::expectException(Exception::class);
+
+        $this->game->playerMark("player3", new TilePosition(1,1));
     }
 }

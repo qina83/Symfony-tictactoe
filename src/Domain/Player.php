@@ -4,8 +4,12 @@
 namespace App\Domain;
 
 
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
+
 class Player
 {
+    private UuidInterface $id;
     private string $nickName;
     private int $mark;
     private Board $board;
@@ -18,6 +22,7 @@ class Player
      */
     public function __construct(string $nickName, int $mark, Board $board)
     {
+        $this->id = Uuid::uuid4();
         $this->nickName = $nickName;
         $this->mark = $mark;
         $this->board = $board;
