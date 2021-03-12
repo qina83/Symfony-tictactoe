@@ -8,19 +8,31 @@ use Ramsey\Uuid\UuidInterface;
 
 class AddPlayerCommand
 {
-     private UuidInterface $gameId;
-     private string $playerNickName;
+    private UuidInterface $gameId;
+    private string $playerNickName;
+    private Mark $mark;
 
     /**
      * AddPlayerCommand constructor.
      * @param UuidInterface $gameId
      * @param string $playerNickName
+     * @param Mark $mark
      */
-    public function __construct(UuidInterface $gameId, string $playerNickName)
+    public function __construct(UuidInterface $gameId, string $playerNickName, Mark $mark)
     {
         $this->gameId = $gameId;
         $this->playerNickName = $playerNickName;
+        $this->mark = $mark;
     }
+
+    /**
+     * @return Mark
+     */
+    public function getMark(): Mark
+    {
+        return $this->mark;
+    }
+
 
     /**
      * @return UuidInterface

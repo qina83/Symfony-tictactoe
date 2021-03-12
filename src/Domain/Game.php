@@ -17,7 +17,7 @@ class Game
     /** @var Player[] */
     private array $players;
     private ?UuidInterface $nextPlayerId;
-    private ?UuidInterface $winnerId;
+    private ?Player $winner;
 
     /**
      * @return UuidInterface
@@ -87,9 +87,9 @@ class Game
         if ($threeInARowResult->result()) {
             $winnerMark = $threeInARowResult->getMark();
             if ($winnerMark->equalTo($this->players[0]->getMark())) {
-                $this->winnerId = $this->players[0]->getId();
+                $this->winner = $this->players[0];
             } else
-                $this->winnerId = $this->players[1]->getId();
+                $this->winner = $this->players[1];
         }
 
         if (!$this->nextPlayerId || $this->nextPlayerId === $this->players[1]->getId())
@@ -103,16 +103,27 @@ class Game
         Assert::eq($this->nextPlayerId, $player->getId());
         Assert::false($this->isGameOver());
 
-        $this->board->getTile($position)->mark( $player->getMark());
+        $this->board->getTile($position)->mark($player->getMark());
 
         $this->checkWinnerAndChangeTurn();
     }
+
+    public function playerMarksByNickName(string $nickname, TilePosition $position)
+    {
+        $player = array_filter($this->players,
+            function (Player $pl) use ($nickname) {
+                return $pl->getNickName() === $nickname;
+            })[0];
+
+        $this->playerMarks($player, $position);
+    }
+
 
 
 
     public function isGameOver()
     {
-        return $this->winnerId != null;
+        return $this->winner != null;
     }
 
     public function startGame()
@@ -134,9 +145,9 @@ class Game
     /**
      * @return UuidInterface|null
      */
-    public function getWinnerId(): ?UuidInterface
+    public function getWinner(): ?Player
     {
-        return $this->winnerId;
+        return $this->winner;
     }
 
     public function resetGame()
@@ -144,7 +155,7 @@ class Game
         $this->board = new Board();
         $this->players = [];
         $this->nextPlayerId = null;
-        $this->winnerId = null;
+        $this->winner = null;
     }
 
 }

@@ -159,7 +159,7 @@ class GameTest extends TestCase
         $this->game->playerMarks($player2, new TilePosition(2,2));
         $this->game->playerMarks($player1, new TilePosition(1,2));
 
-        self::assertEquals($player1->getId(), $this->game->getWinnerId());
+        self::assertEquals($player1, $this->game->getWinner());
     }
 
     public function test_gameIsOver_playerTryToPlay_mustThrowException()

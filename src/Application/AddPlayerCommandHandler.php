@@ -6,6 +6,8 @@ namespace App\Application;
 use App\Domain\AddPlayerCommand;
 use App\Domain\GamePersister;
 use App\Domain\GameRepository;
+use App\Domain\Mark;
+use App\Domain\Player;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Webmozart\Assert\Assert;
 
@@ -30,7 +32,8 @@ class AddPlayerCommandHandler implements MessageHandlerInterface
         $game = $this->gameRepository->get($command->getGameId());
         Assert::notNull($game);
 
-        $game->addPlayer($command->getPlayerNickName());
-        $this->gamePersister->store($game);
+        $player = new Player($command->getPlayerNickName(), $command->getMark());
+        $game->addPlayer($player);
+        $this->gamePersister->storePlayer($player, $game->getId());
     }
 }

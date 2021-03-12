@@ -7,6 +7,7 @@ use App\Domain\AddPlayerCommand;
 use App\Domain\Game;
 use App\Domain\GamePersister;
 use App\Domain\GameRepository;
+use App\Domain\Mark;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -38,23 +39,25 @@ class AddPlayerCommandHandlerTest extends TestCase
         $this->prophet->checkPredictions();
     }
 
-    public function test_gameIdNotExists_mustThrowException(){
+    public function test_gameIdNotExists_mustThrowException()
+    {
         $this->gameRepository->get(Argument::any())->willReturn(null);
         $handler = new AddPlayerCommandHandler($this->gamePersister->reveal(), $this->gameRepository->reveal());
 
         self::expectException(Exception::class);
 
-        $handler(new AddPlayerCommand( Uuid::uuid4(), "aPlayer"));
+        $handler(new AddPlayerCommand(Uuid::uuid4(), "aPlayer", Mark::createAsOMark()));
     }
 
-    public function test_addPlayer_mustStoreGame(){
+    public function test_addPlayer_mustStoreGame()
+    {
         $game = new Game();
 
         $this->gameRepository->get(Argument::any())->willReturn($game);
-        $this->gamePersister->store($game)->shouldBeCalled();
+        $this->gamePersister->storePlayer(Argument::any(), Argument::any())->shouldBeCalled();
         $handler = new AddPlayerCommandHandler($this->gamePersister->reveal(), $this->gameRepository->reveal());
 
-        $handler(new AddPlayerCommand( Uuid::uuid4(), "aPlayer"));
+        $handler(new AddPlayerCommand(Uuid::uuid4(), "aPlayer", Mark::createAsOMark()));
 
         self::assertTrue(true); //to avoid that is marked as risky test. Assertion is made by prophecy
     }

@@ -31,7 +31,7 @@ class PlayerMarkCommandHandler implements MessageHandlerInterface
         $game = $this->gameRepository->get($command->getGameId());
         Assert::notNull($game);
 
-        $game->playerMark($command->getPlayerNickName(), $command->getTilePosition());
+        $game->playerMarksByNickName($command->getPlayerNickName(), $command->getTilePosition());
         $this->gamePersister->store($game);
     }
 }
