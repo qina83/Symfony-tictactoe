@@ -4,6 +4,8 @@ namespace App\Tests\Domain;
 
 use App\Domain\Game;
 
+use App\Domain\Mark;
+use App\Domain\Player;
 use App\Domain\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -18,34 +20,28 @@ class GameTest extends TestCase
         $this->game = new Game();
     }
 
-    public function test_addPlayers_player1MustBeO_player2MustBeX()
-    {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
-
-        $players = $this->game->getPlayers();
-
-        self::assertTrue($players[0]->isO());
-        self::assertTrue($players[1]->isX());
-    }
-
     public function test_addPlayersWithSameNick_mustThrowException()
     {
-        $this->game->addPlayer("player1");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player1", Mark::createAsXMark());
 
+        $this->game->addPlayer($player1);
 
         self::expectException(Exception::class);
-        $this->game->addPlayer("player1");
+        $this->game->addPlayer($player2);
     }
 
     public function test_addMoreThan2Players_MustThrowException()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $player3 = new Player("player3", Mark::createAsXMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
 
         self::expectException(Exception::class);
 
-        $this->game->addPlayer("player3");
+        $this->game->addPlayer($player3);
     }
 
     public function test_withoutPlayers_cannotStartGame_MustThrowException()
@@ -56,7 +52,8 @@ class GameTest extends TestCase
 
     public function test_addOnlyOnePlayer_cannotStartGame_MustThrowException()
     {
-        $this->game->addPlayer("player1");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $this->game->addPlayer($player1);
         self::expectException(Exception::class);
 
         $this->game->startGame();
@@ -64,8 +61,11 @@ class GameTest extends TestCase
 
     public function test_startGame_boardMustBeClean()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
+
 
         $this->game->startGame();
 
@@ -74,125 +74,146 @@ class GameTest extends TestCase
 
     public function test_startGame_nextPlayerMustBePlayerOne()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
 
         $this->game->startGame();
 
-        $this->assertTrue($this->game->isPlayer1Turn());
+        $this->assertEquals($player1->getId(), $this->game->getNextPlayerId());
     }
 
     public function test_afterPlayer1IsPlayer2Turn()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
 
-        $this->assertTrue($this->game->isPlayer2Turn());
+        $this->assertEquals($player2->getId(), $this->game->getNextPlayerId());
+
     }
 
     public function test_playerNotPlayAlternatively_mustThrowException()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
 
         self::expectException(Exception::class);
-        $this->game->player1Mark(new TilePosition(1,1));
+        $this->game->playerMarks($player1, new TilePosition(1,2));
 
     }
 
     public function test_afterFewRound_gameIsNotOver()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
-        $this->game->player2Mark(new TilePosition(1,2));
-        $this->game->player1Mark(new TilePosition(2,2));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
+        $this->game->playerMarks($player2, new TilePosition(1,2));
+        $this->game->playerMarks($player1, new TilePosition(1,3));
 
         self::assertFalse($this->game->isGameOver());
     }
 
     public function test_playerWin_gameIsOver()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
-        $this->game->player2Mark(new TilePosition(3,3));
-        $this->game->player1Mark(new TilePosition(1,2));
-        $this->game->player2Mark(new TilePosition(2,3));
-        $this->game->player1Mark(new TilePosition(1,3));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
+        $this->game->playerMarks($player2, new TilePosition(2,1));
+        $this->game->playerMarks($player1, new TilePosition(1,3));
+        $this->game->playerMarks($player2, new TilePosition(2,2));
+        $this->game->playerMarks($player1, new TilePosition(1,2));
 
         self::assertTrue($this->game->isGameOver());
     }
 
     public function test_player1Win_winnerIsPlayer1()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
-        $this->game->player2Mark(new TilePosition(3,3));
-        $this->game->player1Mark(new TilePosition(1,2));
-        $this->game->player2Mark(new TilePosition(2,3));
-        $this->game->player1Mark(new TilePosition(1,3));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
+        $this->game->playerMarks($player2, new TilePosition(2,1));
+        $this->game->playerMarks($player1, new TilePosition(1,3));
+        $this->game->playerMarks($player2, new TilePosition(2,2));
+        $this->game->playerMarks($player1, new TilePosition(1,2));
 
-        self::assertEquals($this->game->getPlayer1(), $this->game->getWinner());
+        self::assertEquals($player1->getId(), $this->game->getWinnerId());
     }
 
     public function test_gameIsOver_playerTryToPlay_mustThrowException()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
-        $this->game->player1Mark(new TilePosition(1,1));
-        $this->game->player2Mark(new TilePosition(3,3));
-        $this->game->player1Mark(new TilePosition(1,2));
-        $this->game->player2Mark(new TilePosition(2,3));
-        $this->game->player1Mark(new TilePosition(1,3));
+        $this->game->playerMarks($player1, new TilePosition(1,1));
+        $this->game->playerMarks($player2, new TilePosition(2,1));
+        $this->game->playerMarks($player1, new TilePosition(1,3));
+        $this->game->playerMarks($player2, new TilePosition(2,2));
+        $this->game->playerMarks($player1, new TilePosition(1,2));
 
         self::expectException(Exception::class);
 
-        $this->game->player2Mark(new TilePosition(2,2));
+        $this->game->playerMarks($player2, new TilePosition(3,3));
     }
 
 
     public function test_gameIsOver_restartGame_BoardIsClean()
     {
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
-        $this->game->player1Mark(new TilePosition(1,1));
-        $this->game->player2Mark(new TilePosition(3,3));
-        $this->game->player1Mark(new TilePosition(1,2));
-        $this->game->player2Mark(new TilePosition(2,3));
-        $this->game->player1Mark(new TilePosition(1,3));
+
+        $this->game->playerMarks($player1, new TilePosition(1,1));
+        $this->game->playerMarks($player2, new TilePosition(2,1));
+        $this->game->playerMarks($player1, new TilePosition(1,3));
+        $this->game->playerMarks($player2, new TilePosition(2,2));
+        $this->game->playerMarks($player1, new TilePosition(2,3));
+
 
         $this->game->resetGame();
 
         self::assertTrue($this->game->getBoard()->isClean());
         self::assertFalse($this->game->isGameOver());
-        self::assertNull($this->game->getPlayer1());
-        self::assertNull($this->game->getPlayer2());
+        self::assertEmpty($this->game->getPlayers());
     }
 
-    public function test_playerMark_nickname_NotExists_mustThrowException(){
-        $this->game->addPlayer("player1");
-        $this->game->addPlayer("player2");
+    public function test_playerMark_PlayerNotExists_mustThrowException(){
+        $player1 = new Player("player1", Mark::createAsXMark());
+        $player2 = new Player("player2", Mark::createAsOMark());
+        $player3 = new Player("player3", Mark::createAsXMark());
+        $this->game->addPlayer($player1);
+        $this->game->addPlayer($player2);
         $this->game->startGame();
 
         self::expectException(Exception::class);
 
-        $this->game->playerMark("player3", new TilePosition(1,1));
+        $this->game->playerMarks($player3, new TilePosition(1,1));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Tests\Domain;
 
 use App\Domain\Board;
+use App\Domain\Mark;
 use App\Domain\ThreeInARowResult;
 use App\Domain\TilePosition;
 use Exception;
@@ -85,87 +86,67 @@ class BoardTest extends TestCase
      */
     public function test_setTileAsX_mustTileBeMarkedAsX(TilePosition $position)
     {
-        $this->board->markTileAsO($position);
+        $mark = Mark::createAsXMark();
+        $this->board->markTile($position, $mark);
 
-        self::assertTrue($this->board->isTileMarkedAsO($position));
+        self::assertTrue($this->board->getTile($position)->getMark()->isX());
     }
 
     /**
      * @dataProvider inRangePositionDataProvider
      */
-    public function test_setTileAsX_mustTileBeMarkedAsY(TilePosition $position)
+    public function test_setTileAsO_mustTileBeMarkedAsO(TilePosition $position)
     {
-        $this->board->markTileAsX($position);
+        $mark = Mark::createAsOMark();
+        $this->board->markTile($position, $mark);
 
-        self::assertTrue($this->board->isTileMarkedAsX($position));
+        self::assertTrue($this->board->getTile($position)->getMark()->isO());
     }
 
 
     /**
      * @dataProvider outOfRangePositionDataProvider
      */
-    public function test_setTileAsX_PositionNotValid_mustThrowException(TilePosition $position)
+    public function test_markTile_PositionNotValid_mustThrowException(TilePosition $position)
     {
+        $mark = Mark::createAsOMark();
         self::expectException(Exception::class);
-        $this->board->markTileAsX($position);
+
+        $this->board->markTile($position, $mark);
     }
 
-    /**
-     * @dataProvider outOfRangePositionDataProvider
-     */
-    public function test_setTileAsO_PositionNotValid_mustThrowException(TilePosition $position)
-    {
-        self::expectException(Exception::class);
-        $this->board->markTileAsO($position);
-    }
 
     /**
      * @dataProvider ThreeInARowDataProvider
      * @param TilePosition[] $threeTilePosition
      */
-    public function test_ThreeInARowO(array $threeTilePosition)
+    public function test_ThreeInARow(array $threeTilePosition)
     {
         foreach ($threeTilePosition as $item) {
-            $this->board->markTileAsO($item);
+            $mark = Mark::createAsOMark();
+            $this->board->markTile($item, $mark);
         }
 
         $res = $this->board->checkThreeInARaw();
 
         self::assertTrue($res->result());
-        self::assertTrue($res->isO());
     }
 
-    /**
-     * @dataProvider ThreeInARowDataProvider
-     * @param TilePosition[] $threeTilePosition
-     */
-    public function test_ThreeInARowX(array $threeTilePosition)
-    {
-        foreach ($threeTilePosition as $item) {
-            $this->board->markTileAsX($item);
-        }
-
-        $res = $this->board->checkThreeInARaw();
-
-        self::assertTrue($res->result());
-        self::assertTrue($res->isX());
-    }
 
     /**
      * @dataProvider ThreeNonInARowDataProvider
      * @param TilePosition[] $threeTilePosition
      */
-    public function test_ThreeNoInARowX(array $threeTilePosition)
+    public function test_ThreeNoInARow(array $threeTilePosition)
     {
         foreach ($threeTilePosition as $item) {
-            $this->board->markTileAsX($item);
+            $mark = Mark::createAsOMark();
+            $this->board->markTile($item, $mark);
         }
 
         $res = $this->board->checkThreeInARaw();
 
         self::assertFalse($res->result());
-        self::assertFalse($res->isX());
-        self::assertFalse($res->isO());
     }
 
     public function test_isClear_trueScenario()
@@ -175,13 +156,15 @@ class BoardTest extends TestCase
 
     public function test_isClear_falseScenario()
     {
-        $this->board->markTileAsO(new TilePosition(1, 1));
+        $mark = Mark::createAsOMark();
+        $this->board->markTile(new TilePosition(1,1), $mark);
         self::assertFalse($this->board->isClean());
     }
 
     public function test_cleanBoard()
     {
-        $this->board->markTileAsO(new TilePosition(1, 1));
+        $mark = Mark::createAsOMark();
+        $this->board->markTile(new TilePosition(1,1), $mark);
         $this->board->clearBoard();
 
         self::assertTrue($this->board->isClean());

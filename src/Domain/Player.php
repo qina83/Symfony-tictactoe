@@ -11,21 +11,34 @@ class Player
 {
     private UuidInterface $id;
     private string $nickName;
-    private int $mark;
-    private Board $board;
+    private Mark $mark;
+
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMark(): Mark
+    {
+        return $this->mark;
+    }
 
     /**
      * Player constructor.
      * @param string $nickName
-     * @param int $mark
-     * @param Board $board
+     * @param Mark $mark
      */
-    public function __construct(string $nickName, int $mark, Board $board)
+    public function __construct(string $nickName, Mark $mark)
     {
         $this->id = Uuid::uuid4();
         $this->nickName = $nickName;
         $this->mark = $mark;
-        $this->board = $board;
     }
 
 
@@ -34,31 +47,7 @@ class Player
         return $this->nickName;
     }
 
-    public static function createXPlayer(string $nickName, Board $board)
-    {
-        return new Player($nickName, 2, $board);
-    }
-
-    public static function createOPlayer(string $nickName, Board $board)
-    {
-        return new Player($nickName, 1, $board);
-    }
-
-    public function isX()
-    {
-        return $this->mark == 2;
-    }
-
-    public function isO()
-    {
-        return $this->mark == 1;
-    }
-
-    public function mark(TilePosition $position)
-    {
-        if ($this->isO())
-            $this->board->markTileAsO($position);
-        else
-            $this->board->markTileAsX($position);
+    public function sameMarkOf(Player $player){
+        return $this->mark->equalTo($player->mark);
     }
 }

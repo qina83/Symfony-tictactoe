@@ -7,9 +7,9 @@ namespace App\Domain;
 class ThreeInARowResult
 {
     private bool $result;
-    private int $mark;
+    private ?Mark $mark;
 
-    /** @var TilePosition[]  */
+    /** @var TilePosition[] */
     private array $positions;
 
     /**
@@ -20,10 +20,10 @@ class ThreeInARowResult
         return $this->positions;
     }
 
-    private function __construct(bool $result, int $state, array $positions)
+    private function __construct(bool $result = false, array $positions = [], ?Mark $mark = null)
     {
         $this->result = $result;
-        $this->mark = $state;
+        $this->mark = $mark;
         $this->positions = $positions;
     }
 
@@ -34,21 +34,16 @@ class ThreeInARowResult
      */
     public static function noThreeInARowResult()
     {
-        return new ThreeInARowResult(false, 0, []);
+        return new ThreeInARowResult();
     }
 
     /**
      * @param TilePosition[] $positions
      * @return ThreeInARowResult
      */
-    public static function threeOInARowResult(array $positions)
+    public static function threeInARow(array $positions, Mark $mark)
     {
-        return new ThreeInARowResult(true, 1, $positions);
-    }
-
-      public static function threeXInARowResult(array $positions)
-    {
-        return new ThreeInARowResult(true, 2, $positions);
+        return new ThreeInARowResult(true, $positions, $mark);
     }
 
     /**
@@ -59,14 +54,13 @@ class ThreeInARowResult
         return $this->result;
     }
 
-    public function isO(): bool
-    {
-        return $this->mark == 1;
-    }
 
-    public function isX(): bool
+    /**
+     * @return Mark|null
+     */
+    public function getMark(): ?Mark
     {
-        return $this->mark == 2;
+        return $this->mark;
     }
 
 

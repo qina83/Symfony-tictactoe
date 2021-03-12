@@ -13,10 +13,11 @@ class Game
 {
     private UuidInterface $id;
     private Board $board;
-    private ?Player $player1;
-    private ?Player $player2;
-    private ?Player $nextPlayer;
-    private ?Player $winner;
+
+    /** @var Player[] */
+    private array $players;
+    private ?UuidInterface $nextPlayerId;
+    private ?UuidInterface $winnerId;
 
     /**
      * @return UuidInterface
@@ -36,13 +37,16 @@ class Game
         $this->id = Uuid::uuid4();
     }
 
-
     /**
-     * @return Player|null
+     * @param Player[] $players
      */
-    public function getWinner(): ?Player
+    public static function fromData(UuidInterface $id, array $players): Game
     {
-        return $this->winner;
+        $game = new Game();
+        $game->id = $id;
+        $game->players = $players;
+
+        return $game;
     }
 
     /**
@@ -53,38 +57,27 @@ class Game
         return $this->board;
     }
 
-    /**
-     * @return Player|null
-     */
-    public function getPlayer1(): ?Player
+    public function addPlayer(Player $player)
     {
-        return $this->player1;
+        if (count($this->players) === 2) throw new Exception("Maximum number of player reached");
+        if (count($this->players) === 0) {
+            $this->players[] = $player;
+        }
+        else
+        {
+            if ($this->players[0]->sameMarkOf($player)) throw new Exception("Player with this mark already exists");
+            else
+                $this->players[] = $player;
+        }
     }
 
-    /**
-     * @return Player|null
-     */
-    public function getPlayer2(): ?Player
-    {
-        return $this->player2;
-    }
-
-    public function addPlayer(string $nickName)
-    {
-        if (!$this->player1) {
-            $this->player1 = Player::createOPlayer($nickName, $this->board);
-        } else if (!$this->player2) {
-            if ($this->player1->getNickName() === $nickName) throw new Exception("Nickname already used");
-            $this->player2 = Player::createXPlayer($nickName, $this->board);
-        } else throw new Exception("Maximum number of player reached");
-    }
 
     /**
      * @return Player[]
      */
     public function getPlayers(): array
     {
-        return [$this->player1, $this->player2];
+        return $this->players;
     }
 
     private function checkWinnerAndChangeTurn()
@@ -92,76 +85,66 @@ class Game
         $threeInARowResult = $this->board->checkThreeInARaw();
 
         if ($threeInARowResult->result()) {
-            if ($threeInARowResult->isO()) {
-                $this->winner = $this->player1;
+            $winnerMark = $threeInARowResult->getMark();
+            if ($winnerMark->equalTo($this->players[0]->getMark())) {
+                $this->winnerId = $this->players[0]->getId();
             } else
-                $this->winner = $this->player2;
+                $this->winnerId = $this->players[1]->getId();
         }
 
-        if (!$this->nextPlayer || $this->nextPlayer === $this->player2)
-            $this->nextPlayer = $this->player1;
+        if (!$this->nextPlayerId || $this->nextPlayerId === $this->players[1]->getId())
+            $this->nextPlayerId = $this->players[0]->getId();
         else
-            $this->nextPlayer = $this->player2;
+            $this->nextPlayerId = $this->players[1]->getId();
     }
 
-    public function playerMark(string $nikname, TilePosition $position)
+    public function playerMarks(Player $player, TilePosition $position)
     {
-        if ($nikname === $this->player1->getNickName())
-            $this->player1Mark($position);
-        else
-            if ($nikname === $this->player2->getNickName())
-                $this->player2Mark($position);
-            else throw new Exception("Nickname unknown");
-    }
-
-    public function player1Mark(TilePosition $position)
-    {
-        Assert::true($this->isPlayer1Turn());
+        Assert::eq($this->nextPlayerId, $player->getId());
         Assert::false($this->isGameOver());
 
-        $this->player1->mark($position);
+        $this->board->getTile($position)->mark( $player->getMark());
+
         $this->checkWinnerAndChangeTurn();
     }
 
-    public function player2Mark(TilePosition $position)
-    {
-        Assert::true($this->isPlayer2Turn());
-        Assert::false($this->isGameOver());
-        $this->player1->mark($position);
-        $this->checkWinnerAndChangeTurn();
-    }
 
-    public function isPlayer1Turn()
-    {
-        return $this->player1 === $this->nextPlayer;
-    }
-
-    public function isPlayer2Turn()
-    {
-        return $this->player2 === $this->nextPlayer;
-    }
 
     public function isGameOver()
     {
-        return $this->winner != null;
+        return $this->winnerId != null;
     }
 
     public function startGame()
     {
-        Assert::notNull($this->player1);
-        Assert::notNull($this->player2);
+        Assert::count($this->players, 2);
 
         $this->board->clearBoard();
         $this->checkWinnerAndChangeTurn();
     }
 
+    /**
+     * @return UuidInterface|null
+     */
+    public function getNextPlayerId(): ?UuidInterface
+    {
+        return $this->nextPlayerId;
+    }
+
+    /**
+     * @return UuidInterface|null
+     */
+    public function getWinnerId(): ?UuidInterface
+    {
+        return $this->winnerId;
+    }
+
     public function resetGame()
     {
         $this->board = new Board();
-        $this->player1 = null;
-        $this->player2 = null;
-        $this->nextPlayer = null;
-        $this->winner = null;
+        $this->players = [];
+        $this->nextPlayerId = null;
+        $this->winnerId = null;
     }
 
 }

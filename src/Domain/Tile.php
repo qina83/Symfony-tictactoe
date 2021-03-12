@@ -9,8 +9,16 @@ use Ramsey\Uuid\UuidInterface;
 
 class Tile
 {
+    //TODO Mark maybe is a domain object
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
     private UuidInterface $id;
-    private int $mark;
+    private ?Mark $mark;
 
     /**
      * Tile constructor.
@@ -21,40 +29,37 @@ class Tile
         $this->clean();
     }
 
-    public function markWithO(): void
+    /**
+     * @return int
+     */
+    public function getMark(): ?Mark
     {
-        if (!$this->isClean()) throw new Exception("Tile is not clean");
-        $this->mark = 1;
+        return $this->mark;
     }
 
-    public function markWithX(): void
+    public function mark(Mark $mark): void
     {
         if (!$this->isClean()) throw new Exception("Tile is not clean");
-        $this->mark = 2;
+        $this->mark =$mark;
     }
 
     public function clean(): void
     {
-        $this->mark = 0;
+        $this->mark = null;
     }
 
     public function isClean(): bool
     {
-        return $this->mark == 0;
-    }
-
-    public function isO(): bool
-    {
-        return $this->mark == 1;
-    }
-
-    public function isX(): bool
-    {
-        return $this->mark == 2;
+        return !$this->mark;
     }
 
     public function markedAs(Tile $tile){
-        return $tile->mark == $this->mark;
+        if ($this->isClean() && $this->isClean()) return true;
+
+        if (($this->isClean() && !$tile->isClean()) ||
+            (!$this->isClean() && $tile->isClean())) return false;
+
+        return $tile->mark->equalTo($this->mark);
     }
 
 }

@@ -9,6 +9,14 @@ use Ramsey\Uuid\UuidInterface;
 
 class Board
 {
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
+
     private UuidInterface $id;
 
     /** @var Tile[][] */
@@ -84,16 +92,12 @@ class Board
             $position->getCol() > 3;
     }
 
-    public function isTileMarkedAsX(TilePosition $position): bool
-    {
-        if ($this->isPositionOutOfRange($position)) throw new Exception("Position not exists");
-        return $this->tiles[$position->getRow()][$position->getCol()]->isX();
-    }
 
-    public function isTileMarkedAsO(TilePosition $position): bool
+
+    public function getTile(TilePosition $position): Tile
     {
         if ($this->isPositionOutOfRange($position)) throw new Exception("Position not exists");
-        return $this->tiles[$position->getRow()][$position->getCol()]->isO();
+        return $this->tiles[$position->getRow()][$position->getCol()];
     }
 
     /**
@@ -113,19 +117,14 @@ class Board
         }
     }
 
-    public function markTileAsX(TilePosition $position)
+    public function markTile(TilePosition $position, Mark $mark)
     {
         if ($this->isPositionOutOfRange($position)) throw new Exception("Position not exists");
-        $this->tiles[$position->getRow()][$position->getCol()]->markWithX();
+        $this->tiles[$position->getRow()][$position->getCol()]->mark($mark);
     }
 
-    public function markTileAsO(TilePosition $position)
+    public function isClean(): bool
     {
-        if ($this->isPositionOutOfRange($position)) throw new Exception("Position not exists");
-        $this->tiles[$position->getRow()][$position->getCol()]->markWithO();
-    }
-
-    public function isClean():bool {
         $res = true;
         foreach ($this->tiles as $tileRow) {
             foreach ($tileRow as $tile) {
@@ -162,15 +161,8 @@ class Board
             && $tile1->markedAs($tile2)
             && $tile1->markedAs($tile3)) {
 
-
-            if ($tile1->isX())
-                return ThreeInARowResult::threeXInARowResult($positions);
-            else
-                return ThreeInARowResult::threeOInARowResult($positions);
+            return ThreeInARowResult::threeInARow($positions, $tile1->getMark());
         }
-
         return ThreeInARowResult::noThreeInARowResult();
     }
-
-
 }
