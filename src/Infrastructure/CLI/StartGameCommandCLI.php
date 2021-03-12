@@ -6,6 +6,9 @@ namespace App\Infrastructure\CLI;
 use App\Domain\AddPlayerCommand;
 use App\Domain\CreateGameCommand;
 use App\Domain\Mark;
+use App\Domain\PlayerMarkCommand;
+use App\Domain\StartGameCommand;
+use App\Domain\TilePosition;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Console\Command\Command;
@@ -16,9 +19,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Webmozart\Assert\Assert;
 
-class AddPlayerToGameCLICommand extends Command
+class StartGameCommandCLI extends Command
 {
-    protected static $defaultName = 'app:add-player';
+    protected static $defaultName = 'app:start-game';
     private MessageBusInterface $bus;
 
     public function __construct(MessageBusInterface $bus)
@@ -33,33 +36,25 @@ class AddPlayerToGameCLICommand extends Command
         parent::configure();
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Add player to game')
+            ->setDescription('Start game')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('This command allows you to add a player to an existing game. Needs gameid and player nickname and X or =')
+            ->setHelp('This command allows you to start existing game')
 
             // configure an argument
-            ->addArgument('gameId', InputArgument::REQUIRED, 'The id of game.')
-            ->addArgument('nickname', InputArgument::REQUIRED, 'The nickname of player.')
-            ->addArgument('mark', InputArgument::REQUIRED, 'X o O')
-            // ...
-        ;
+            ->addArgument('gameId', InputArgument::REQUIRED, 'The id of game.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mark = $input->getArgument('mark');
-        Assert::oneOf($mark, ['X', 'O'], "Mark must b X or O");
-        $mark = $mark === "X" ? Mark::createAsXMark() : Mark::createAsOMark();
 
-        $cmd = new AddPlayerCommand(
-            UuidV4::fromString($input->getArgument('gameId')),
-            $input->getArgument('nickname'),
-            $mark
+        $cmd = new StartGameCommand(
+            UuidV4::fromString($input->getArgument('gameId'))
         );
-         $this->bus->dispatch($cmd);
-        $output->writeln("Player added");
+
+        $this->bus->dispatch($cmd);
+        $output->writeln("game started");
         return Command::SUCCESS;
     }
 }

@@ -19,22 +19,22 @@ final class Version20210311141937 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
+        $tableGame = $schema->createTable('game');
+        $tableGame->addColumn('uuid', 'string', ['length' => 36, 'notnull' => true]);
+        $tableGame->setPrimaryKey(['uuid']);
+
         $tableBoard = $schema->createTable('board');
         $tableBoard->addColumn('uuid', 'string', ['length' => 36, 'notnull' => true]);
+        $tableBoard->addColumn('game_id', 'string', ['length' => 36, 'notnull' => true]);
+        $tableBoard->addForeignKeyConstraint($tableGame, ['game_id'], ['uuid'], array("onUpdate" => "CASCADE"));
         $tableBoard->setPrimaryKey(['uuid']);
 
         $tableTile = $schema->createTable('tile');
         $tableTile->addColumn('uuid', 'string', ['length' => 36, 'notnull' => true]);
-        $tableTile->addColumn('mark', 'integer', ['notnull' => true]);
-        $tableTile->addColumn('board_id', 'string', ['length' => 36, 'notnull' => true]);
-        $tableTile->addForeignKeyConstraint($tableBoard, ['board_id'], ['uuid'], array("onUpdate" => "CASCADE"));
+        $tableTile->addColumn('mark', 'integer', ['notnull' => false]);
+        $tableTile->addColumn('game_id', 'string', ['length' => 36, 'notnull' => true]);
+        $tableTile->addForeignKeyConstraint($tableGame, ['game_id'], ['uuid'], array("onUpdate" => "CASCADE"));
         $tableTile->setPrimaryKey(['uuid']);
-
-        $tableGame = $schema->createTable('game');
-        $tableGame->addColumn('uuid', 'string', ['length' => 36, 'notnull' => true]);
-        $tableGame->addColumn('board_id', 'string', ['length' => 36, 'notnull' => true]);
-        $tableGame->addForeignKeyConstraint($tableBoard, ['board_id'], ['uuid'], array("onUpdate" => "CASCADE"));
-        $tableGame->setPrimaryKey(['uuid']);
 
         $tablePlayer = $schema->createTable('player');
         $tablePlayer->addColumn('uuid', 'string', ['length' => 36, 'notnull' => true]);

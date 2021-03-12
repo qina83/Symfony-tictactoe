@@ -3,15 +3,16 @@
 
 namespace App\Application;
 
-
-use App\Domain\Game;
+use App\Domain\AddPlayerCommand;
 use App\Domain\GamePersister;
 use App\Domain\GameRepository;
-use App\Domain\PlayerMarkCommand;
+use App\Domain\Mark;
+use App\Domain\Player;
+use App\Domain\StartGameCommand;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Webmozart\Assert\Assert;
 
-class PlayerMarkCommandHandler implements MessageHandlerInterface
+class StartGameCommandHandler implements MessageHandlerInterface
 {
     private GamePersister $gamePersister;
     private GameRepository $gameRepository;
@@ -27,13 +28,12 @@ class PlayerMarkCommandHandler implements MessageHandlerInterface
         $this->gameRepository = $gameRepository;
     }
 
-    public function __invoke(PlayerMarkCommand $command): Game
+    public function __invoke(StartGameCommand $command): void
     {
         $game = $this->gameRepository->get($command->getGameId());
         Assert::notNull($game);
 
-        $game->playerMarksByNickName($command->getPlayerNickName(), $command->getTilePosition());
+        $game->startGame();
         $this->gamePersister->updateGame($game);
-        return $game;
     }
 }

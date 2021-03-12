@@ -26,13 +26,13 @@ class GamePersisterDBAL implements GamePersister
         $this->connection = $connection;
     }
 
-    public function store(Game $game): void
+    public function storeGame(Game $game): void
     {
         try {
             $this->connection->beginTransaction();
-            $this->storeBoard($game->getBoard());
-            $this->storeTiles($game->getBoard()->getTiles(), $game->getBoard()->getId());
-            $this->storeGame($game, $game->getBoard()->getId());
+            $this->store($game);
+            $this->storeBoard($game->getBoard(), $game->getId());
+            $this->storeTiles($game->getBoard()->getTiles(), $game->getId());
             $this->connection->commit();
         } catch (\Exception $e) {
             $this->connection->rollBack();
@@ -40,7 +40,7 @@ class GamePersisterDBAL implements GamePersister
         }
     }
 
-    private function storeBoard(Board $board): void
+    private function storeBoard(Board $board, UuidInterface $gameId): void
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
@@ -48,8 +48,10 @@ class GamePersisterDBAL implements GamePersister
             ->insert('board')
             ->values([
                 'uuid' => '?',
+                'game_id' => '?'
             ])
-            ->setParameter(0, $board->getId()->toString());
+            ->setParameter(0, $board->getId()->toString())
+            ->setParameter(1, $gameId->toString());
 
         $queryBuilder->execute();
     }
@@ -57,40 +59,41 @@ class GamePersisterDBAL implements GamePersister
     /**
      * @param Tile[][] $tiles
      */
-    private function storeTiles(array $tiles, UuidInterface $boardId): void
+    private function storeTiles(array $tiles, UuidInterface $gameId): void
     {
+        for ($row = 1; $row <= 3; $row++) {
+            for ($col = 1; $col <= 3; $col++) {
+                $tile = $tiles[$row][$col];
 
-        foreach ($tiles as $tileRow) {
-            foreach ($tileRow as $tile) {
                 $queryBuilder = $this->connection->createQueryBuilder();
                 $queryBuilder
                     ->insert('tile')
                     ->values([
                         'uuid' => '?',
-                        'mark' => '?',
-                        'board_id' => '?'
+                        'row' => '?',
+                        'col' => '?',
+                        'game_id' => '?'
                     ])
                     ->setParameter(0, $tile->getId()->toString())
-                    ->setParameter(1, $tile->getMark()) //servirebbe un mapper. Per velocità ho messo il metodo get esposto.
-                    ->setParameter(2, $boardId->toString());
+                    ->setParameter(1, $row)
+                    ->setParameter(2, $col)
+                    ->setParameter(3, $gameId->toString());
 
                 $queryBuilder->execute();
             }
         }
     }
 
-    private function storeGame(Game $game, UuidInterface $boardId): void
+    private function store(Game $game): void
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
         $queryBuilder
             ->insert('game')
             ->values([
-                'uuid' => '?',
-                'board_id' => '?'
+                'uuid' => '?'
             ])
-            ->setParameter(0, $game->getId()->toString())
-            ->setParameter(1, $boardId->toString());
+            ->setParameter(0, $game->getId()->toString());
 
         $queryBuilder->execute();
     }
@@ -108,10 +111,51 @@ class GamePersisterDBAL implements GamePersister
                 'game_id' => '?'
             ])
             ->setParameter(0, $player->getId()->toString())
-            ->setParameter(1, $player->getMark())
+            ->setParameter(1, $player->getMark()->isX() ? 1 : 2)
             ->setParameter(2, $player->getNickName())
             ->setParameter(3, $gameId->toString());
 
         $queryBuilder->execute();
+    }
+
+    /**
+     * @param Tile[][] $tiles
+     */
+    private function updateTiles(array $tiles): void
+    {
+        foreach ($tiles as $tileRow) {
+            foreach ($tileRow as $tile) {
+                $queryBuilder = $this->connection->createQueryBuilder();
+                $queryBuilder
+                    ->update('tile')
+                    ->set('mark', MarkMapperDBAL::toDb($tile->getMark()))
+                    ->where("uuid = '{$tile->getId()}'");
+
+                $queryBuilder->execute();
+            }
+        }
+    }
+
+    private function updateGameStatus(Game $game){
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder
+            ->update('game')
+            ->set('next_player_id', "'{$game->getNextPlayerId()}'")
+            ->where("uuid = '{$game->getId()}'");
+
+        $queryBuilder->execute();
+    }
+
+    public function updateGame(Game $game)
+    {
+        try {
+            $this->connection->beginTransaction();
+            $this->updateTiles($game->getBoard()->getTiles());
+            $this->updateGameStatus($game);
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 }

@@ -25,7 +25,7 @@ class CreateGameCommandHandler implements MessageHandlerInterface
     public function __invoke(CreateGameCommand $command): UuidInterface
     {
         $game = new Game();
-        $this->gamePersister->store($game);
+        $this->gamePersister->storeGame($game);
         return $game->getId();
     }
 }

@@ -34,7 +34,7 @@ class CreateGameCommandHandlerTest extends TestCase
 
     public function test_admin()
     {
-        $this->gamePersister->store(Argument::any())->shouldBeCalled();
+        $this->gamePersister->storeGame(Argument::any())->shouldBeCalled();
         $handler = new CreateGameCommandHandler($this->gamePersister->reveal());
         $gameId = $handler(new CreateGameCommand());
 

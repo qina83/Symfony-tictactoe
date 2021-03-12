@@ -4,12 +4,13 @@
 namespace App\Domain;
 
 use Exception;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 class Tile
 {
-    //TODO Mark maybe is a domain object
+
     /**
      * @return UuidInterface
      */
@@ -27,6 +28,13 @@ class Tile
     {
         $this->id = Uuid::uuid4();
         $this->clean();
+    }
+
+    public static function fromData(string $id, ?Mark $mark): Tile{
+        $tile = new Tile();
+        $tile->id = UuidV4::fromString($id);
+        $tile->mark = $mark;
+        return $tile;
     }
 
     /**

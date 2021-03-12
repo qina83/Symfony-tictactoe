@@ -4,8 +4,11 @@
 namespace App\Infrastructure\DBAL;
 
 
+use App\Domain\Board;
 use App\Domain\Game;
 use App\Domain\GameRepository;
+use App\Domain\Player;
+use App\Domain\Tile;
 use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\UuidInterface;
 
@@ -24,12 +27,55 @@ class GameRepositoryDBAL implements GameRepository
 
     public function get(UuidInterface $gameId): ?Game
     {
-        $game = $this->getGame($gameId);
-        if (!$game) return null;
+        $players = $this->getPlayers($gameId);
+        $board = $this->getBoard($gameId);
 
-
-
+        $game = $this->getGame($gameId, $players, $board);
+        return $game;
     }
+
+
+    /**
+     * @param UuidInterface $gameId
+     * @return Tile[][]
+     */
+    private function getTiles(UuidInterface $gameId): array
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+
+        $data = $queryBuilder
+            ->select('*')
+            ->from('tile',)
+            ->where('game_id=?')
+            ->setParameter(0, $gameId->toString())
+            ->execute()
+            ->fetchAllAssociative();
+
+        return TilesMapperDBAL::fromDb($data);
+    }
+
+    private function getBoard(UuidInterface $gameId): ?Board
+    {
+
+        $tiles = $this->getTiles($gameId);
+
+        $queryBuilder = $this->connection->createQueryBuilder();
+
+        $dbGame = $queryBuilder
+            ->select('uuid')
+            ->from('board',)
+            ->where('game_id=?')
+            ->setParameter(0, $gameId->toString())
+            ->execute()
+            ->fetchAllAssociative();
+
+        if (0 == \count($dbGame)) {
+            return null;
+        }
+
+        return BoardMapperDBAL::fromDb($dbGame[0], $tiles);
+    }
+
 
     /**
      * @return Player[]
@@ -37,7 +83,6 @@ class GameRepositoryDBAL implements GameRepository
     private function getPlayers(UuidInterface $gameId): array
     {
         $queryBuilder = $this->connection->createQueryBuilder();
-
         $dbPlayers = $queryBuilder
             ->select('uuid, nickname, mark')
             ->from('player')
@@ -46,22 +91,22 @@ class GameRepositoryDBAL implements GameRepository
             ->execute()
             ->fetchAllAssociative();
 
-
         $players = [];
         foreach ($dbPlayers as $dbPlayer) {
             $players[] = PlayerMapperDBAL::fromDB($dbPlayer);
         }
-
         return $players;
-
     }
 
-    private function getGame(UuidInterface $gameId): ?Game
+    /**
+     * @param Player[] $players
+     */
+    private function getGame(UuidInterface $gameId, array $players, Board $board): ?Game
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
         $dbGame = $queryBuilder
-            ->select('uuid')
+            ->select('*')
             ->from('game',)
             ->where('uuid=?')
             ->setParameter(0, $gameId->toString())
@@ -72,6 +117,6 @@ class GameRepositoryDBAL implements GameRepository
             return null;
         }
 
-        return GameMapperDBAL::fromDb($dbGame[0]);
+        return GameMapperDBAL::fromDb($dbGame[0],$players, $board);
     }
 }

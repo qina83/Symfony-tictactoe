@@ -19,12 +19,12 @@ class Mark
 
     public function isO(): bool
     {
-        return $this->state === 1;
+        return $this->state === 2;
     }
 
     public function isX(): bool
     {
-        return $this->state === 2;
+        return $this->state === 1;
     }
 
     public function equalTo(Mark $mark)
@@ -34,12 +34,12 @@ class Mark
 
     public static function createAsOMark():Mark
     {
-        return new Mark(1);
+        return new Mark(2);
     }
 
     public static function createAsXMark():Mark
     {
-        return new Mark(2);
+        return new Mark(1);
     }
 }
 

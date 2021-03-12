@@ -4,6 +4,7 @@
 namespace App\Domain;
 
 use Exception;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -28,16 +29,9 @@ class Board
     /**
      * Board constructor.
      */
-    public function __construct()
+    private function __construct()
     {
         $this->id = Uuid::uuid4();
-
-        $this->tiles = [];
-        for ($i = 1; $i <= 3; $i++) {
-            for ($j = 1; $j <= 3; $j++) {
-                $this->tiles[$i][$j] = new Tile();
-            }
-        }
 
         $this->winnerPositions = [
             [
@@ -83,6 +77,32 @@ class Board
         ];
     }
 
+
+    /**
+     * @param string $id
+     * @param Tile[][] $tiles
+     * @return Board
+     */
+    public static function fromData(string $id, array $tiles): Board
+    {
+        $board = new Board();
+        $board->id = UuidV4::fromString($id);
+        $board->tiles =$tiles;
+        return $board;
+    }
+
+    public static function emptyBoard(): Board
+    {
+        $board = new Board();
+        $board->tiles = [];
+        for ($row = 1; $row <= 3; $row++) {
+            for ($col = 1; $col <= 3; $col++) {
+                $board->tiles[$row][$col] = new Tile();
+            }
+        }
+        return $board;
+    }
+
     private function isPositionOutOfRange(TilePosition $position): bool
     {
         return
@@ -91,7 +111,6 @@ class Board
             $position->getCol() < 1 ||
             $position->getCol() > 3;
     }
-
 
 
     public function getTile(TilePosition $position): Tile

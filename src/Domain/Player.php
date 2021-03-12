@@ -4,6 +4,7 @@
 namespace App\Domain;
 
 
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -39,6 +40,13 @@ class Player
         $this->id = Uuid::uuid4();
         $this->nickName = $nickName;
         $this->mark = $mark;
+    }
+
+    public static function fromData(string $id, string $nickName, Mark $mark):Player
+    {
+        $player = new Player($nickName, $mark);
+        $player->id = UuidV4::fromString($id);
+        return $player;
     }
 
 

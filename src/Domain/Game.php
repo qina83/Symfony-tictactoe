@@ -40,12 +40,13 @@ class Game
     /**
      * @param Player[] $players
      */
-    public static function fromData(UuidInterface $id, array $players): Game
+    public static function fromData(UuidInterface $id, ?UuidInterface $nextPlayerId, array $players, Board $board): Game
     {
         $game = new Game();
         $game->id = $id;
+        $game->nextPlayerId = $nextPlayerId;
         $game->players = $players;
-
+        $game->board = $board;
         return $game;
     }
 
@@ -92,7 +93,7 @@ class Game
                 $this->winner = $this->players[1];
         }
 
-        if (!$this->nextPlayerId || $this->nextPlayerId === $this->players[1]->getId())
+        if (!$this->nextPlayerId || $this->nextPlayerId->equals($this->players[1]->getId()))
             $this->nextPlayerId = $this->players[0]->getId();
         else
             $this->nextPlayerId = $this->players[1]->getId();
@@ -110,15 +111,11 @@ class Game
 
     public function playerMarksByNickName(string $nickname, TilePosition $position)
     {
-        $player = array_filter($this->players,
-            function (Player $pl) use ($nickname) {
-                return $pl->getNickName() === $nickname;
-            })[0];
-
-        $this->playerMarks($player, $position);
+        foreach ($this->players as $player) {
+            if ($player->getNickName() === $nickname)
+                $this->playerMarks($player, $position);
+        }
     }
-
-
 
 
     public function isGameOver()
@@ -129,8 +126,6 @@ class Game
     public function startGame()
     {
         Assert::count($this->players, 2);
-
-        $this->board->clearBoard();
         $this->checkWinnerAndChangeTurn();
     }
 
@@ -152,7 +147,7 @@ class Game
 
     public function resetGame()
     {
-        $this->board = new Board();
+        $this->board = Board::emptyBoard();
         $this->players = [];
         $this->nextPlayerId = null;
         $this->winner = null;
