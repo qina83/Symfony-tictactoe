@@ -2,9 +2,9 @@
 
 namespace App\Tests\Application;
 
-use App\Application\CreateGameCommandHandler;
-use App\Domain\CreateGameCommand;
-use App\Domain\GamePersister;
+use App\Game\Application\CreateGameCommandHandler;
+use App\Game\Domain\CreateGameCommand;
+use App\Game\Domain\GamePersister;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

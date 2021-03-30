@@ -2,10 +2,10 @@
 
 namespace App\Tests\Domain;
 
-use App\Domain\Board;
-use App\Domain\Mark;
-use App\Domain\ThreeInARowResult;
-use App\Domain\TilePosition;
+use App\Game\Domain\Board;
+use App\Game\Domain\Mark;
+use App\Game\Domain\ThreeInARowResult;
+use App\Game\Domain\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
 

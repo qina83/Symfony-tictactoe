@@ -2,8 +2,8 @@
 
 namespace App\Tests\Domain;
 
-use App\Domain\Mark;
-use App\Domain\Tile;
+use App\Game\Domain\Mark;
+use App\Game\Domain\Tile;
 use PHPUnit\Framework\TestCase;
 
 class TileTest extends TestCase

@@ -2,14 +2,14 @@
 
 namespace App\Tests\Application;
 
-use App\Application\PlayerMarkCommandHandler;
-use App\Domain\Game;
-use App\Domain\GamePersister;
-use App\Domain\GameRepository;
-use App\Domain\Mark;
-use App\Domain\Player;
-use App\Domain\PlayerMarkCommand;
-use App\Domain\TilePosition;
+use App\Game\Application\PlayerMarkCommandHandler;
+use App\Game\Domain\Game;
+use App\Game\Domain\GamePersister;
+use App\Game\Domain\GameRepository;
+use App\Game\Domain\Mark;
+use App\Game\Domain\Player;
+use App\Game\Domain\PlayerMarkCommand;
+use App\Game\Domain\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

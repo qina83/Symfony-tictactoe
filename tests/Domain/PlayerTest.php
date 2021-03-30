@@ -2,9 +2,9 @@
 
 namespace App\Tests\Domain;
 
-use App\Domain\Board;
-use App\Domain\Mark;
-use App\Domain\Player;
+use App\Game\Domain\Board;
+use App\Game\Domain\Mark;
+use App\Game\Domain\Player;
 use PHPUnit\Framework\TestCase;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service_locator;
 

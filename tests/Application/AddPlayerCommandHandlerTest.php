@@ -2,12 +2,12 @@
 
 namespace App\Tests\Application;
 
-use App\Application\AddPlayerCommandHandler;
-use App\Domain\AddPlayerCommand;
-use App\Domain\Game;
-use App\Domain\GamePersister;
-use App\Domain\GameRepository;
-use App\Domain\Mark;
+use App\Game\Application\AddPlayerCommandHandler;
+use App\Game\Domain\AddPlayerCommand;
+use App\Game\Domain\Game;
+use App\Game\Domain\GamePersister;
+use App\Game\Domain\GameRepository;
+use App\Game\Domain\Mark;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

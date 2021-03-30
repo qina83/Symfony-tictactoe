@@ -3,7 +3,7 @@
 namespace App\Tests\Domain;
 
 
-use App\Domain\Mark;
+use App\Game\Domain\Mark;
 use PHPUnit\Framework\TestCase;
 
 class MarkTest extends TestCase
