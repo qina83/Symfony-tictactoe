@@ -19,7 +19,7 @@ class CreateUserCommand
      */
     public function __construct(string $playerNickName)
     {
-        Assert::notEmpty($playerNickName);
+        Assert::notEmpty($playerNickName, "Nickname must be not empty");
         $this->playerNickName = $playerNickName;
     }
 

@@ -73,6 +73,9 @@
       <path value="$PROJECT_DIR$/vendor/laminas/laminas-code" />
       <path value="$PROJECT_DIR$/vendor/laminas/laminas-zendframework-bridge" />
       <path value="$PROJECT_DIR$/vendor/laminas/laminas-eventmanager" />
+      <path value="$PROJECT_DIR$/vendor/beberlei/assert" />
+      <path value="$PROJECT_DIR$/vendor/broadway/uuid-generator" />
+      <path value="$PROJECT_DIR$/vendor/broadway/broadway" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
