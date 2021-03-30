@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Tests\Application;
+namespace App\Tests\Game\Application;
 
 use App\Game\Application\PlayerMarkCommandHandler;
-use App\Game\Domain\Game;
-use App\Game\Domain\GamePersister;
-use App\Game\Domain\GameRepository;
-use App\Game\Domain\Mark;
-use App\Game\Domain\Player;
-use App\Game\Domain\PlayerMarkCommand;
-use App\Game\Domain\TilePosition;
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Repository\GamePersister;
+use App\Game\Domain\Repository\GameRepository;
+use App\Game\Domain\Model\Mark;
+use App\Game\Domain\Model\Player;
+use App\Game\Domain\Command\PlayerMarkCommand;
+use App\Game\Domain\Model\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -52,8 +52,8 @@ class PlayerMarkCommandHandlerTest extends TestCase
 
     public function test_addPlayer_mustStoreGame(){
         $game = new Game();
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2","fa05b2ac-5988-42d6-a48d-ee62ad63ad02", Mark::createAsOMark());
         $game->addPlayer($player1);
         $game->addPlayer($player2);
         $game->startGame();

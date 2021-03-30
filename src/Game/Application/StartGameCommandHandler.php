@@ -2,12 +2,9 @@
 
 namespace App\Game\Application;
 
-use App\Game\Domain\AddPlayerCommand;
-use App\Game\Domain\GamePersister;
-use App\Game\Domain\GameRepository;
-use App\Game\Domain\Mark;
-use App\Game\Domain\Player;
-use App\Game\Domain\StartGameCommand;
+use App\Game\Domain\Repository\GamePersister;
+use App\Game\Domain\Repository\GameRepository;
+use App\Game\Domain\Command\StartGameCommand;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Webmozart\Assert\Assert;
 

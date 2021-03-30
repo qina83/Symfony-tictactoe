@@ -3,7 +3,7 @@
 
 namespace App\Game\Infrastructure\DBAL;
 
-use App\Game\Domain\Tile;
+use App\Game\Domain\Model\Tile;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class TilesMapperDBAL

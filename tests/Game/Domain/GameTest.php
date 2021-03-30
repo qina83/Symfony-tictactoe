@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\Domain;
+namespace App\Tests\Game\Domain;
 
-use App\Game\Domain\Game;
+use App\Game\Domain\Model\Game;
 
-use App\Game\Domain\Mark;
-use App\Game\Domain\Player;
-use App\Game\Domain\TilePosition;
+use App\Game\Domain\Model\Mark;
+use App\Game\Domain\Model\Player;
+use App\Game\Domain\Model\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -22,8 +22,8 @@ class GameTest extends TestCase
 
     public function test_addPlayersWithSameNick_mustThrowException()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player1", Mark::createAsXMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
+        $player2 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02", Mark::createAsXMark());
 
         $this->game->addPlayer($player1);
 
@@ -33,9 +33,9 @@ class GameTest extends TestCase
 
     public function test_addMoreThan2Players_MustThrowException()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
-        $player3 = new Player("player3", Mark::createAsXMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2","fa05b2ac-5988-42d6-a48d-ee62ad63ad02", Mark::createAsOMark());
+        $player3 = new Player("player3","fa05b2ac-5988-42d6-a48d-ee62ad63ad03", Mark::createAsXMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
 
@@ -52,7 +52,7 @@ class GameTest extends TestCase
 
     public function test_addOnlyOnePlayer_cannotStartGame_MustThrowException()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
         $this->game->addPlayer($player1);
         self::expectException(Exception::class);
 
@@ -61,8 +61,8 @@ class GameTest extends TestCase
 
     public function test_startGame_boardMustBeClean()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
 
@@ -74,8 +74,8 @@ class GameTest extends TestCase
 
     public function test_startGame_nextPlayerMustBePlayerOne()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
 
@@ -86,8 +86,8 @@ class GameTest extends TestCase
 
     public function test_afterPlayer1IsPlayer2Turn()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -100,8 +100,8 @@ class GameTest extends TestCase
 
     public function test_playerNotPlayAlternatively_mustThrowException()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -115,8 +115,8 @@ class GameTest extends TestCase
 
     public function test_afterFewRound_gameIsNotOver()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -130,8 +130,8 @@ class GameTest extends TestCase
 
     public function test_playerWin_gameIsOver()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -147,8 +147,8 @@ class GameTest extends TestCase
 
     public function test_player1Win_winnerIsPlayer1()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1","fa05b2ac-5988-42d6-a48d-ee62ad63ad01", Mark::createAsXMark());
+        $player2 = new Player("player2","fa05b2ac-5988-42d6-a48d-ee62ad63ad02", Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -164,8 +164,8 @@ class GameTest extends TestCase
 
     public function test_gameIsOver_playerTryToPlay_mustThrowException()
     {
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
+        $player2 = new Player("player2","fa05b2ac-5988-42d6-a48d-ee62ad63ad02", Mark::createAsOMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();
@@ -182,9 +182,9 @@ class GameTest extends TestCase
     }
 
     public function test_playerMark_PlayerNotExists_mustThrowException(){
-        $player1 = new Player("player1", Mark::createAsXMark());
-        $player2 = new Player("player2", Mark::createAsOMark());
-        $player3 = new Player("player3", Mark::createAsXMark());
+        $player1 = new Player("player1", "fa05b2ac-5988-42d6-a48d-ee62ad63ad01",Mark::createAsXMark());
+        $player2 = new Player("player2", "fa05b2ac-5988-42d6-a48d-ee62ad63ad02",Mark::createAsOMark());
+        $player3 = new Player("player3", "fa05b2ac-5988-42d6-a48d-ee62ad63ad03",Mark::createAsXMark());
         $this->game->addPlayer($player1);
         $this->game->addPlayer($player2);
         $this->game->startGame();

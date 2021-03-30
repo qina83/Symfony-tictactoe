@@ -3,9 +3,9 @@
 
 namespace App\Game\Application;
 
-use App\Game\Domain\CreateGameCommand;
-use App\Game\Domain\Game;
-use App\Game\Domain\GamePersister;
+use App\Game\Domain\Command\CreateGameCommand;
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Repository\GamePersister;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 

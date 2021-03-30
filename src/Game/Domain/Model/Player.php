@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Game\Domain;
+namespace App\Game\Domain\Model;
 
 
 use Ramsey\Uuid\Rfc4122\UuidV4;
@@ -10,7 +10,15 @@ use Ramsey\Uuid\UuidInterface;
 
 class Player
 {
+    /**
+     * @return UuidInterface
+     */
+    public function getUserId(): UuidInterface
+    {
+        return $this->userId;
+    }
     private UuidInterface $id;
+    private UuidInterface $userId;
     private string $nickName;
     private Mark $mark;
 
@@ -30,21 +38,17 @@ class Player
         return $this->mark;
     }
 
-    /**
-     * Player constructor.
-     * @param string $nickName
-     * @param Mark $mark
-     */
-    public function __construct(string $nickName, Mark $mark)
+    public function __construct(string $nickName, string $userId, Mark $mark)
     {
         $this->id = Uuid::uuid4();
         $this->nickName = $nickName;
+        $this->userId = UuidV4::fromString($userId);
         $this->mark = $mark;
     }
 
-    public static function fromData(string $id, string $nickName, Mark $mark):Player
+    public static function fromData(string $id, string $nickName, string $userId, Mark $mark):Player
     {
-        $player = new Player($nickName, $mark);
+        $player = new Player($nickName,$userId, $mark);
         $player->id = UuidV4::fromString($id);
         return $player;
     }

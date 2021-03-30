@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Application;
+namespace App\Tests\Game\Application;
 
 use App\Game\Application\CreateGameCommandHandler;
-use App\Game\Domain\CreateGameCommand;
-use App\Game\Domain\GamePersister;
+use App\Game\Domain\Command\CreateGameCommand;
+use App\Game\Domain\Repository\GamePersister;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

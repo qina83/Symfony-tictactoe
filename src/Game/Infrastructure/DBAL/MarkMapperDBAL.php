@@ -4,7 +4,7 @@
 namespace App\Game\Infrastructure\DBAL;
 
 
-use App\Game\Domain\Mark;
+use App\Game\Domain\Model\Mark;
 
 class MarkMapperDBAL
 {

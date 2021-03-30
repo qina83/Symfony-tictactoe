@@ -1,9 +1,11 @@
 <?php
 
 
-namespace App\Game\Domain;
+namespace App\Game\Domain\Repository;
 
 
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Model\Player;
 use Ramsey\Uuid\UuidInterface;
 
 interface GamePersister

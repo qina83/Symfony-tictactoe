@@ -4,11 +4,11 @@
 namespace App\Game\Infrastructure\DBAL;
 
 
-use App\Game\Domain\Board;
-use App\Game\Domain\Tile;
-use App\Game\Domain\Player;
-use App\Game\Domain\Game;
-use App\Game\Domain\GamePersister;
+use App\Game\Domain\Model\Board;
+use App\Game\Domain\Model\Tile;
+use App\Game\Domain\Model\Player;
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Repository\GamePersister;
 use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -108,12 +108,14 @@ class GamePersisterDBAL implements GamePersister
                 'uuid' => '?',
                 'mark' => '?',
                 'nickName' => '?',
-                'game_id' => '?'
+                'game_id' => '?',
+                'user_id' => '?'
             ])
             ->setParameter(0, $player->getId()->toString())
             ->setParameter(1, $player->getMark()->isX() ? 1 : 2)
             ->setParameter(2, $player->getNickName())
-            ->setParameter(3, $gameId->toString());
+            ->setParameter(3, $gameId->toString())
+            ->setParameter(3, $player->getUserId());
 
         $queryBuilder->execute();
     }
@@ -136,7 +138,8 @@ class GamePersisterDBAL implements GamePersister
         }
     }
 
-    private function updateGameStatus(Game $game){
+    private function updateGameStatus(Game $game)
+    {
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder
             ->update('game')

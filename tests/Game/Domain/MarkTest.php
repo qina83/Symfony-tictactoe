@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Tests\Domain;
+namespace App\Tests\Game\Domain;
 
 
-use App\Game\Domain\Mark;
+use App\Game\Domain\Model\Mark;
 use PHPUnit\Framework\TestCase;
 
 class MarkTest extends TestCase

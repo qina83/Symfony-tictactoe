@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests\Domain;
+namespace App\Tests\Game\Domain;
 
-use App\Game\Domain\Board;
-use App\Game\Domain\Mark;
-use App\Game\Domain\ThreeInARowResult;
-use App\Game\Domain\TilePosition;
+use App\Game\Domain\Model\Board;
+use App\Game\Domain\Model\Mark;
+use App\Game\Domain\Model\ThreeInARowResult;
+use App\Game\Domain\Model\TilePosition;
 use Exception;
 use PHPUnit\Framework\TestCase;
 

@@ -1,28 +1,39 @@
 <?php
 
 
-namespace App\Game\Domain;
+namespace App\Game\Domain\Command;
 
+
+use App\Game\Domain\Model\Mark;
 use Ramsey\Uuid\UuidInterface;
 
-class PlayerMarkCommand
+class AddPlayerCommand
 {
     private UuidInterface $gameId;
     private string $playerNickName;
-    private TilePosition $tilePosition;
+    private Mark $mark;
 
     /**
-     * PlayerMarkCommand constructor.
+     * AddPlayerCommand constructor.
      * @param UuidInterface $gameId
      * @param string $playerNickName
-     * @param TilePosition $tilePosition
+     * @param Mark $mark
      */
-    public function __construct(UuidInterface $gameId, string $playerNickName, TilePosition $tilePosition)
+    public function __construct(UuidInterface $gameId, string $playerNickName, Mark $mark)
     {
         $this->gameId = $gameId;
         $this->playerNickName = $playerNickName;
-        $this->tilePosition = $tilePosition;
+        $this->mark = $mark;
     }
+
+    /**
+     * @return Mark
+     */
+    public function getMark(): Mark
+    {
+        return $this->mark;
+    }
+
 
     /**
      * @return UuidInterface
@@ -39,14 +50,5 @@ class PlayerMarkCommand
     {
         return $this->playerNickName;
     }
-
-    /**
-     * @return TilePosition
-     */
-    public function getTilePosition(): TilePosition
-    {
-        return $this->tilePosition;
-    }
-
 
 }

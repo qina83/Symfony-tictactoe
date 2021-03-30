@@ -4,11 +4,11 @@
 namespace App\Game\Infrastructure\DBAL;
 
 
-use App\Game\Domain\Board;
-use App\Game\Domain\Game;
-use App\Game\Domain\GameRepository;
-use App\Game\Domain\Player;
-use App\Game\Domain\Tile;
+use App\Game\Domain\Model\Board;
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Repository\GameRepository;
+use App\Game\Domain\Model\Player;
+use App\Game\Domain\Model\Tile;
 use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\UuidInterface;
 

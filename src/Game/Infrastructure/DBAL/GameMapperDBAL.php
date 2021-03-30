@@ -4,9 +4,9 @@
 namespace App\Game\Infrastructure\DBAL;
 
 
-use App\Game\Domain\Board;
-use App\Game\Domain\Game;
-use App\Game\Domain\Player;
+use App\Game\Domain\Model\Board;
+use App\Game\Domain\Model\Game;
+use App\Game\Domain\Model\Player;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class GameMapperDBAL

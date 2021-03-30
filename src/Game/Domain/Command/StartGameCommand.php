@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Game\Domain;
+namespace App\Game\Domain\Command;
 
 
 use Ramsey\Uuid\UuidInterface;
